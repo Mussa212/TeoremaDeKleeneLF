@@ -6,8 +6,6 @@
 
 ```bash
 git clone https://github.com/Mussa212/TeoremaDeKleeneLF.git
-
-go mod tidy 
 ```
 
 2. SetUp del proyecto:
