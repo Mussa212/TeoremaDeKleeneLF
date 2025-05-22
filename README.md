@@ -20,7 +20,7 @@ Por ejemplo:
 
 ```bash
 
-go run ./cmd/kleene -re "(a+b)*" -out automata.png
+go run main.go -re "(a+b)*" -out automata.png
 
-go run ./cmd/kleene -re "ab+ba" -out prueba.png
+go run main.go -re "ab+ba" -out prueba.png
 ```
