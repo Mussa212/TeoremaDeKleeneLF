@@ -9,6 +9,7 @@ git clone https://github.com/Mussa212/TeoremaDeKleeneLF.git
 ```
 
 2. SetUp del proyecto:
+   - Debe tener instalado GoLang.
    - Debe tener instalado GraphViz.
 3. Ejecutar el programa:
 
