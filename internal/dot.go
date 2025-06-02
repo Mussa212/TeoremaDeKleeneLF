@@ -6,16 +6,16 @@ import (
 )
 
 // ToDOT genera el grafo DOT pero usando nombres q0, q1, …
-func (nfa *NFA) ToDOT() string {
+func (afn *AFN) ToDOT() string {
 	// helper que mapea un entero a "q<entero>"
 	name := func(id int) string {
 		return fmt.Sprintf("q%d", id)
 	}
 
 	g := gographviz.NewEscape()
-	g.SetName("NFA")
+	g.SetName("AFN")
 	g.SetDir(true)
-	g.AddAttr("NFA", "rankdir", "LR")
+	g.AddAttr("AFN", "rankdir", "LR")
 
 	seen := map[int]*State{}
 	var visit func(s *State)
@@ -31,7 +31,7 @@ func (nfa *NFA) ToDOT() string {
 			attrs["shape"] = "doublecircle"
 		}
 		// crea el nodo con el nombre "q<ID>"
-		g.AddNode("NFA", name(s.ID), attrs)
+		g.AddNode("AFN", name(s.ID), attrs)
 
 		// transiciones con letra
 		for ch, dsts := range s.Trans {
@@ -42,32 +42,32 @@ func (nfa *NFA) ToDOT() string {
 			}
 		}
 		// transiciones ε
-		for _, d := range s.Epsilon {
+		for _, d := range s.Lambda {
 			g.AddEdge(name(s.ID), name(d.ID), true,
 				map[string]string{"label": "λ"})
 			visit(d)
 		}
 	}
 	// arranca el recorrido desde el estado inicial
-	visit(nfa.Start)
+	visit(afn.Start)
 
 	// nodo "start" apuntando a q<start.ID>
-	g.AddNode("NFA", "start", map[string]string{"shape": "point"})
-	g.AddEdge("start", name(nfa.Start.ID), true, nil)
+	g.AddNode("AFN", "start", map[string]string{"shape": "point"})
+	g.AddEdge("start", name(afn.Start.ID), true, nil)
 
 	return g.String()
 }
 
-func (nfa *NFA) Renumber() {
+func (afn *AFN) Renumber() {
 	// BFS para recolectar todos los estados alcanzables
 	seen := make(map[*State]bool)
-	order := []*State{nfa.Start}
-	seen[nfa.Start] = true
+	order := []*State{afn.Start}
+	seen[afn.Start] = true
 
 	for i := 0; i < len(order); i++ {
 		s := order[i]
 		// recorré transiciones ε
-		for _, d := range s.Epsilon {
+		for _, d := range s.Lambda {
 			if !seen[d] {
 				seen[d] = true
 				order = append(order, d)

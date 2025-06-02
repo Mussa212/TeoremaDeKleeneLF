@@ -20,7 +20,7 @@ func main() {
 
 	toks := internal.Scan(*re)
 	postfix := internal.ToPostfix(toks)
-	nfa := internal.BuildNFA(postfix)
+	nfa := internal.BuildAFN(postfix)
 	nfa.Renumber()
 	dot := nfa.ToDOT()
 	// escribe dot a archivo temporal
