@@ -2,7 +2,7 @@ package internal
 
 type State struct {
 	ID        int
-	Lambda    []*State          // transiciones espontáneas (ε / λ)
+	Lambda    []*State          // transiciones espontáneas (λ)
 	Trans     map[rune][]*State // transiciones etiquetadas
 	Accepting bool
 }
@@ -36,7 +36,7 @@ func BuildAFN(postfix []Token) *AFN {
 
 		case Lambda:
 			// NFA elemental para 'λ':
-			//   s1 -ε-> s2 (s2 es estado de aceptación)
+			//   s1 -λ-> s2 (s2 es estado de aceptación)
 			s1, s2 := NewState(id), NewState(id+1)
 			id += 2
 			s1.Lambda = append(s1.Lambda, s2)
@@ -45,7 +45,7 @@ func BuildAFN(postfix []Token) *AFN {
 
 		case Concat:
 			// Concatenación de dos NFAs A·B:
-			//   conecta A.Accept -ε-> B.Start, y A.Accept deja de ser acepting
+			//   conecta A.Accept -λ-> B.Start, y A.Accept deja de ser acepting
 			b, a := pop(), pop()
 			a.Accept.Lambda = append(a.Accept.Lambda, b.Start)
 			a.Accept.Accepting = false
@@ -53,8 +53,8 @@ func BuildAFN(postfix []Token) *AFN {
 
 		case Union:
 			// Unión de dos NFAs A + B:
-			//   crea s, f; s -ε-> A.Start y s -ε-> B.Start;
-			//   A.Accept -ε-> f y B.Accept -ε-> f
+			//   crea s, f; s -λ-> A.Start y s -λ-> B.Start;
+			//   A.Accept -λ-> f y B.Accept -λ-> f
 			b, a := pop(), pop()
 			s := NewState(id)
 			id++
@@ -68,8 +68,8 @@ func BuildAFN(postfix []Token) *AFN {
 
 		case Star:
 			// Cerradura de Kleene A*:
-			//   crea s, f; s -ε-> A.Start y s -ε-> f;
-			//   A.Accept -ε-> A.Start y A.Accept -ε-> f
+			//   crea s, f; s -λ-> A.Start y s -λ-> f;
+			//   A.Accept -λ-> A.Start y A.Accept -λ-> f
 			a := pop()
 			s := NewState(id)
 			id++
