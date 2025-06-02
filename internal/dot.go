@@ -5,7 +5,7 @@ import (
 	"github.com/awalterschulze/gographviz"
 )
 
-// ToDOT genera el grafo DOT pero usando nombres q0, q1, …
+// ToDOT genera el grafo DOT y etiqueta las λ-transiciones con "λ"
 func (afn *AFN) ToDOT() string {
 	// helper que mapea un entero a "q<entero>"
 	name := func(id int) string {
@@ -30,10 +30,9 @@ func (afn *AFN) ToDOT() string {
 		if s.Accepting {
 			attrs["shape"] = "doublecircle"
 		}
-		// crea el nodo con el nombre "q<ID>"
 		g.AddNode("AFN", name(s.ID), attrs)
 
-		// transiciones con letra
+		// transiciones por símbolo
 		for ch, dsts := range s.Trans {
 			for _, d := range dsts {
 				g.AddEdge(name(s.ID), name(d.ID), true,
@@ -41,17 +40,18 @@ func (afn *AFN) ToDOT() string {
 				visit(d)
 			}
 		}
-		// transiciones ε
+		// transiciones λ
 		for _, d := range s.Lambda {
 			g.AddEdge(name(s.ID), name(d.ID), true,
 				map[string]string{"label": "λ"})
 			visit(d)
 		}
 	}
-	// arranca el recorrido desde el estado inicial
+
+	// Comenzar el recorrido desde el estado inicial
 	visit(afn.Start)
 
-	// nodo "start" apuntando a q<start.ID>
+	// Nodo “start” apuntando a q<start.ID>
 	g.AddNode("AFN", "start", map[string]string{"shape": "point"})
 	g.AddEdge("start", name(afn.Start.ID), true, nil)
 
@@ -66,7 +66,7 @@ func (afn *AFN) Renumber() {
 
 	for i := 0; i < len(order); i++ {
 		s := order[i]
-		// recorré transiciones ε
+		// recorré transiciones λ
 		for _, d := range s.Lambda {
 			if !seen[d] {
 				seen[d] = true
@@ -84,7 +84,7 @@ func (afn *AFN) Renumber() {
 		}
 	}
 
-	// reasigná IDs secuenciales según el orden BFS
+	// reasignar IDs secuenciales según el orden BFS
 	for idx, s := range order {
 		s.ID = idx
 	}
